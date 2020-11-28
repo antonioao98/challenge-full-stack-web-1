@@ -44,7 +44,7 @@ const {Aluno} = require('../app/models');
   async deleteAluno(req,res){
     const {id} = req.params
     await Aluno.destroy({where:{id:id}}).then((result)=>{
-      res.status(200).json({erro:false, messagem:"Aluno excluido com sucesso !!", result:result})
+      res.status(200).json({erro:false, message:"Aluno excluido com sucesso !!", result:result})
     }).catch((err)=>{
       res.status(400).json({erro:true})
     })

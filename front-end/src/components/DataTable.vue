@@ -35,7 +35,7 @@
               <v-icon small @click="deletar(item)">mdi-delete</v-icon>
             </template>
             <template v-slot:item.editar="{ item }">
-              <v-icon small @click="atualizar(item)">mdi-border-color</v-icon>
+              <v-icon small @click="carregar(item)">mdi-border-color</v-icon>
             </template>
           </v-data-table>
         </v-col>
@@ -47,6 +47,7 @@
             <v-card>
               <v-card-text>
                 <v-form ref="form" v-model="valid" lazy-validation>
+                  <input type="hidden" required v-model="id" />
                   <v-label class="">Nome:</v-label>
                   <v-text-field
                     v-model="nome"
@@ -66,6 +67,7 @@
                   <v-label class="">Registro Acadêmico:</v-label>
                   <v-text-field
                     v-model="ra"
+                    :rules="raRules"
                     label="Informe o registro acadêmico"
                     required
                   ></v-text-field>
@@ -73,6 +75,7 @@
                   <v-label class="">CPF:</v-label>
                   <v-text-field
                     v-model="cpf"
+                    :rules="cpfRules"
                     label="Informe o número do documento"
                     required
                   ></v-text-field>
@@ -81,7 +84,7 @@
                     :disabled="!valid"
                     color="success"
                     class="mr-4"
-                    @click="cadastrar"
+                    @click="atualizar"
                   >
                     Cadastrar
                   </v-btn>
@@ -112,6 +115,16 @@
               </v-snackbar>
             </v-card>
           </v-dialog>
+
+          <v-snackbar v-model="snackbarAPI" :timeout="timeout">
+            {{ textAPI }}
+
+            <template v-slot:action="{ attrs }">
+              <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+                Fechar
+              </v-btn>
+            </template>
+          </v-snackbar>
         </v-col>
       </v-row>
     </v-main>
@@ -119,18 +132,29 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data: () => ({
     multiLine: true,
     snackbar: false,
-    textoSnackbar: "tes",
+    textoSnackbar: "",
     dialog: false,
     valid: true,
+
+    timeout: 5000,
+    snackbarAPI: false,
+    textAPI: "",
+
     search: "",
+
+    id: "",
     nome: "",
     email: "",
     ra: "",
     cpf: "",
+
+    raRules: [(v) => !!v || "O registro acadêmico é obrigatório"],
+    cpfRules: [(v) => !!v || "O CPF é obrigatório"],
     nameRules: [(v) => !!v || "O nome é obrigatório"],
     emailRules: [
       (v) => !!v || "E-mail é obrigat'roio",
@@ -143,47 +167,73 @@ export default {
       { text: "Excluir", value: "excluir", sortable: false },
       { text: "Editar", value: "editar", sortable: false },
     ],
-    dados: [
-      {
-        ra: 1,
-        nome: "Antônio Aragão de Oliveira",
-        cpf: "067.928.266-18",
-        email: "toninho.o.cara@hotmail.com",
-      },
-      {
-        ra: 2,
-        nome: "Matheus Aragão de Oliveira",
-        cpf: "067.928.266-18",
-        email: "toninho.o.cara84@gmail.com",
-      },
-      {
-        ra: 3,
-        nome: "Francy carneiro aragão",
-        cpf: "067.928.266-18",
-        email: "antonioao@unipam.edu.br",
-      },
-    ],
+    dados: [],
   }),
+  mounted() {
+    this.listar();
+  },
+
   methods: {
-    deletar(item) {
-      console.log(Object.values(item) + " chegou aqui");
+    listar() {
+      axios
+        .get("http://localhost:3000/aluno")
+        .then((res) => {
+          this.dados = res.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    atualizar(item) {
+    deletar(item) {
+      axios
+        .delete("http://localhost:3000/deleteAluno/" + item.id)
+        .then((res) => {
+          this.dialog = false;
+          this.textAPI = res.data.message;
+          this.snackbarAPI = true;
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        });
+    },
+    carregar(item) {
+      this.id = item.id;
       this.nome = item.nome;
       this.email = item.email;
       this.ra = item.ra;
       this.cpf = item.cpf;
       this.dialog = true;
     },
-    cadastrar() {
+
+    atualizar() {
       if (
-        (this.item.nome || this.item.email || this.item.ra || this.item.cpf) ==
-        undefined
+        !this.nome ||
+        this.nome == "" ||
+        !this.email ||
+        this.email == "" ||
+        !this.ra ||
+        this.ra == "" ||
+        !this.cpf ||
+        this.cpf == ""
       ) {
         this.textoSnackbar = "Por favor, informe todos os dados !";
         this.snackbar = true;
       } else {
-        console.log("insere no banco");
+        axios
+          .put("http://localhost:3000/updateAluno/" + this.id, {
+            nome: this.nome,
+            email: this.email,
+            ra: this.ra,
+            cpf: this.cpf,
+          })
+          .then((res) => {
+            this.dialog = false;
+            this.textAPI = res.data.message;
+            this.snackbarAPI = true;
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
+          });
       }
     },
   },
