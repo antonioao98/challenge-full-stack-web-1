@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes)=>{
-  const Aluno = sequelize.define("Aluno", {
-    nome:DataTypes.STRING,
+  const Students = sequelize.define("Student", {
+    name:DataTypes.STRING,
     email:DataTypes.STRING,
     ra:DataTypes.STRING,
     cpf:DataTypes.STRING
   });
-  return Aluno;
+  return Students;
 };

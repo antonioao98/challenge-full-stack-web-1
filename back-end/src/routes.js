@@ -1,14 +1,13 @@
 const routes = require('express').Router();
-const {Aluno} = require('./app/models/');
-const AlunoController = require('./controllers/AlunoController')
+const StudentController = require('./controllers/StudentController')
 
-routes.get('/aluno', AlunoController.findAllAluno)
+routes.get('/Student', StudentController.findAllStudent)
 
-routes.post('/newAluno',AlunoController.createAluno)
+routes.post('/newStudent',StudentController.createStudent)
 
-routes.delete('/deleteAluno/:id',AlunoController.deleteAluno)
+routes.delete('/deleteStudent/:id',StudentController.deleteStudent)
 
-routes.put('/updateAluno/:id',AlunoController.updateAluno)
+routes.put('/updateStudent/:id',StudentController.updateStudent)
 
 
 module.exports = routes;

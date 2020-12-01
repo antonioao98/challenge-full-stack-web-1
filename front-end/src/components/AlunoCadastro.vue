@@ -5,7 +5,7 @@
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-label class="">Nome:</v-label>
           <v-text-field
-            v-model="nome"
+            v-model="name"
             :rules="nameRules"
             label="Informe o nome do aluno"
             required
@@ -35,7 +35,7 @@
           <v-btn
             :disabled="!valid"
             color="success"
-            @click="cadastrar"
+            @click="register"
             class="mr-4"
           >
             Cadastrar
@@ -50,7 +50,7 @@
       </v-card-text>
 
       <v-snackbar v-model="snackbar" :multi-line="multiLine">
-        {{ textoSnackbar }}
+        {{ textSnackbar }}
 
         <template v-slot:action="{ attrs }">
           <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
@@ -75,54 +75,52 @@
 <script>
 import axios from "axios";
 export default {
-  name: "AlunoCadastro",
   data: () => ({
     multiLine: true,
-    snackbar: false,
-    textoSnackbar: "",
-
     valid: true,
 
+    //variaveis responsáveis pela snackbar de aviso para os campos vázios ou com erros
+    snackbar: false,
+    textSnackbar: "",
+
+    //variaveis responsáveis pela snackbar que vai executar após executar com sucesso alguma requisição no API
     timeout: 5000,
     snackbarAPI: false,
     textAPI: "",
 
-    nome: "",
+    //variaveis dos inputs
+    name: "",
     email: "",
     ra: "",
     cpf: "",
+
+    //regras para validar os inputs
     nameRules: [(v) => !!v || "O nome é obrigatório"],
     raRules: [(v) => !!v || "O registro acadêmico é obrigatório"],
     cpfRules: [(v) => !!v || "O CPF é obrigatório"],
     emailRules: [
-      (v) => !!v || "E-mail é obrigat'roio",
+      (v) => !!v || "E-mail é obrigatório",
       (v) => /.+@.+\..+/.test(v) || "E-mail deve ser válido",
     ],
-    select: null,
-    items: ["Item 1", "Item 2", "Item 3", "Item 4"],
-    checkbox: false,
   }),
 
   methods: {
-    cadastrar() {
-      if ((this.nome || this.email || this.ra || this.cpf) == undefined) {
-        this.textoSnackbar = "Por favor, informe todos os dados !";
+    //função responsavel por cadastrar um aluno novo
+    register() {
+      if ((this.name || this.email || this.ra || this.cpf) == undefined) {
+        this.textSnackbar = "Por favor, informe todos os dados !";
         this.snackbar = true;
       } else {
         axios
-          .post("http://localhost:3000/newAluno", {
-            nome: this.nome,
+          .post("http://localhost:3000/newStudent", {
+            name: this.name,
             email: this.email,
             ra: this.ra,
             cpf: this.cpf,
           })
           .then((res) => {
             this.valid = false;
-            this.nome = " ";
-            this.emailRules = false;
-            this.email = " ";
-            this.ra = " ";
-            this.cpf = " ";
+            this.reset();
             this.dialog = false;
             this.textAPI = res.data.message;
             this.snackbarAPI = true;
@@ -131,10 +129,19 @@ export default {
             }, 1000);
           })
           .catch((err) => {
-            console.log(err);
+            if (err.response.data.message) {
+              this.textSnackbar = err.response.data.message[0];
+              this.snackbar = true;
+            }
+            if (err.response.data.messageErr == "ra must be unique") {
+              this.textSnackbar = `Já existe um registro acadêmico com ${this.ra}. Por favor, digite um registro válido`;
+              this.snackbar = true;
+              this.ra = "";
+            }
           });
       }
     },
+    //função responsável por resetar os campos do form
     reset() {
       this.$refs.form.reset();
     },
