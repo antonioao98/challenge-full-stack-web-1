@@ -33,7 +33,7 @@
 
   | Routas | Verbo | Parâmetros | Resposta | Descrição |
   |--------|-------|------------|----------|----------|
-  | /Students| GET |            | Array    | Retorna todos alunos (200)
-  | /newStudent | POST | nome (obrigátorio), email (obrigátorio), cpf (obrigátorio), ra (obrigátorio) | Array | Retorno (201)
-  | /updateStudent/:id | PUT| nome (opcional), email (opcional)  | Array | Atualiza os dados do aluno com o ID passado
-  | /deleteStudent/:id | DELETE | | Array |  Deleta o usuário que possui o id = (:id)
+  | /Students| GET |            | Objeto    | Retorna todos alunos (200)
+  | /newStudent | POST | nome (obrigátorio), email (obrigátorio), cpf (obrigátorio), ra (obrigátorio) | Objeto | Retorno (201)
+  | /updateStudent/:id | PUT| nome (opcional), email (opcional)  | Objeto | Atualiza os dados do aluno com o ID passado
+  | /deleteStudent/:id | DELETE | | Objeto |  Deleta o usuário que possui o id = (:id)
