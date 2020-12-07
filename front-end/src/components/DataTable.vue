@@ -56,38 +56,23 @@
               <v-card-text>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <input type="hidden" required v-model="id" />
-                  <v-label class="">Nome:</v-label>
-                  <v-text-field
-                    v-model="name"
-                    :rules="nameRules"
-                    label="Informe o nome do aluno"
-                    required
-                  ></v-text-field>
+                  <v-container>
+                    <v-label class="">Nome:</v-label>
+                    <v-text-field
+                      v-model="name"
+                      :rules="nameRules"
+                      label="Informe o nome do aluno"
+                      required
+                    ></v-text-field>
 
-                  <v-label class="">E-mail:</v-label>
-                  <v-text-field
-                    v-model="email"
-                    :rules="emailRules"
-                    label="Informe o E-mail"
-                    required
-                  ></v-text-field>
-
-                  <v-label class="">Registro Acadêmico:</v-label>
-                  <v-text-field
-                    v-model="ra"
-                    :rules="raRules"
-                    label="Informe o registro acadêmico"
-                    required
-                  ></v-text-field>
-
-                  <v-label class="">CPF:</v-label>
-                  <v-text-field
-                    v-model="cpf"
-                    :rules="cpfRules"
-                    label="Informe o número do documento"
-                    required
-                  ></v-text-field>
-
+                    <v-label class="">E-mail:</v-label>
+                    <v-text-field
+                      v-model="email"
+                      :rules="emailRules"
+                      label="Informe o E-mail"
+                      required
+                    ></v-text-field>
+                  </v-container>
                   <v-btn
                     :disabled="!valid"
                     color="success"
@@ -251,16 +236,7 @@ export default {
     },
     //função responsável por atualizar o registro no banco de dados
     update() {
-      if (
-        !this.name ||
-        this.name == "" ||
-        !this.email ||
-        this.email == "" ||
-        !this.ra ||
-        this.ra == "" ||
-        !this.cpf ||
-        this.cpf == ""
-      ) {
+      if (!this.name || this.name == "" || !this.email || this.email == "") {
         this.textSnackbar = "Por favor, informe todos os dados !";
         this.snackbar = true;
       } else {
@@ -268,8 +244,6 @@ export default {
           .put("http://localhost:3000/updateStudent/" + this.id, {
             name: this.name,
             email: this.email,
-            ra: this.ra,
-            cpf: this.cpf,
           })
           .then((res) => {
             this.dialog = false;

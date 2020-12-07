@@ -56,10 +56,7 @@ module.exports = {
 
   async updateStudent(req,res){
     const {id} = req.params
-    const {name,email,ra} = req.body;
-    let cpf = req.body.cpf
-    cpf = cpfValidator.format(cpf)
-
+    const {name,email} = req.body;
 
     var erro = []
     if(!name || name == null){
@@ -69,18 +66,11 @@ module.exports = {
     {
       erro.push("O e-mail está vazio")
     }
-    if(!ra ||ra ==null)
-    {
-      erro.push("O registro acadêmico está vazio")
-    }
-    if(!cpfValidator.isValid(cpf)){
-      erro.push("CPF inválido, digite um CPF válido no no formato: 000.000.000-00")
-    }
     if(erro.length > 0){
       return res.status(400).json({erro:true, message:erro})
     }
     await Student.update({
-       name, email, ra, cpf,update_at: Date.now()
+       name, email
       },{
         where:{
           id:id
